@@ -4,6 +4,10 @@ export const site = {
   title: "Κατασκευή Ιστοσελίδων | Charisiss",
   description:
     "Εκεί όπου η εντυπωσιακή σχεδίαση συναντά την άψογη λειτουργικότητα. Με σκοπό να δώσουμε ζωή στην ιστοσελίδα σας. Κατασκευή Ιστοσελίδων",
+  shareTitle: "Charisis Samaras — Senior Full-Stack Engineer",
+  shareDescription:
+    "I build reliable, scalable digital products with clean code, thoughtful architecture, and great user experience.",
+  url: "https://charisiss.gr",
   email: "info@charisiss.gr",
   meetUrl: "/meet",
   calendarEmbed:
@@ -30,17 +34,33 @@ export const hero = {
   cta: "Contact",
   tagline:
     "I build reliable, scalable digital products with a focus on clean code, thoughtful architecture, and great user experience.",
-  portrait: "/images/portrait.webp",
+  portrait: "/images/portrait.jpg",
 };
 
 export const about = {
   label: "ABOUT ME",
   body: "I'm a software engineer with experience in designing, developing, and launching end-to-end web solutions. I enjoy solving complex problems, collaborating with teams, and turning ideas into polished, functional products.",
   images: [
-    { src: "/images/about-design.webp", alt: "Website wireframes on a notebook", className: "about-img-1" },
-    { src: "/images/about-dog.webp", alt: "Golden retriever", className: "about-img-2" },
-    { src: "/images/about-workspace.jpg", alt: "Laptop workspace", className: "about-img-3" },
-    { src: "/images/about-photo.webp", alt: "Person walking with a camera", className: "about-img-4" },
+    {
+      src: "/images/about-lifestyle.jpg",
+      alt: "Charisis by the sea",
+      objectPosition: "top",
+    },
+    {
+      src: "/images/about-code.jpg",
+      alt: "Laptop showing code on screen",
+      objectPosition: "top",
+    },
+    {
+      src: "/images/about-dog.webp",
+      alt: "Golden retriever",
+      objectPosition: "top",
+    },
+    {
+      src: "/images/about-design.jpg",
+      alt: "UI design sketches and wireframes",
+      objectPosition: "top",
+    },
   ],
 };
 
@@ -146,7 +166,7 @@ export const contact = {
   title: "Let's work together!",
   body: "Great projects start with a simple conversation. Tell me what you're trying to build, and I'll help you figure out the best way forward.",
   cta: "Contact",
-  avatar: "/images/avatar.webp",
+  avatar: "/images/avatar.jpg",
   copyright: "CHARISISS",
   subtitle: "PREMIUM WEB SOLUTIONS",
 };

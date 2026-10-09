@@ -45,6 +45,7 @@ export function About() {
             src={hero.portrait}
             alt="Charisis Samaras"
             sizes="(min-width: 768px) 40vw, 100vw"
+            objectPosition="center"
             className="aspect-[4/5] rounded-2xl bg-surface"
           />
         </Reveal>
@@ -55,7 +56,8 @@ export function About() {
                 src={image.src}
                 alt={image.alt}
                 sizes="(min-width: 768px) 28vw, 50vw"
-                amount={8}
+                amount={i === 0 ? 0 : 8}
+                objectPosition={image.objectPosition ?? "top"}
                 className="aspect-[4/5] rounded-2xl bg-surface"
               />
             </Reveal>

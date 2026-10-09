@@ -17,21 +17,50 @@ const orbitron = Orbitron({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://charisiss.gr"),
-  title: site.title,
+  metadataBase: new URL(site.url),
+  title: {
+    default: site.title,
+    template: `%s | ${site.name}`,
+  },
   description: site.description,
+  applicationName: site.name,
+  authors: [{ name: "Charisis Samaras", url: site.url }],
+  creator: "Charisis Samaras",
+  keywords: [
+    "Charisis Samaras",
+    "Charisiss",
+    "Full-Stack Engineer",
+    "Web Development",
+    "Next.js",
+    "Thessaloniki",
+    "Κατασκευή Ιστοσελίδων",
+  ],
+  alternates: {
+    canonical: "/",
+  },
   openGraph: {
-    title: site.title,
-    description: site.description,
+    title: site.shareTitle,
+    description: site.shareDescription,
     type: "website",
-    locale: "el_GR",
+    locale: "en_US",
+    alternateLocale: ["el_GR"],
+    url: site.url,
     siteName: site.name,
-    images: ["/images/portrait.webp"],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: site.shareTitle,
+    description: site.shareDescription,
+  },
+  appleWebApp: {
+    title: site.name,
+    statusBarStyle: "black-translucent",
   },
 };
 
 export const viewport: Viewport = {
   themeColor: "#0a0b0b",
+  colorScheme: "dark",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
