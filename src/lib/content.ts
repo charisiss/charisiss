@@ -4,7 +4,7 @@ export const site = {
   title: "Κατασκευή Ιστοσελίδων | Charisiss",
   description:
     "Εκεί όπου η εντυπωσιακή σχεδίαση συναντά την άψογη λειτουργικότητα. Με σκοπό να δώσουμε ζωή στην ιστοσελίδα σας. Κατασκευή Ιστοσελίδων",
-  shareTitle: "Charisis Samaras — Senior Full-Stack Engineer",
+  shareTitle: "Charisis Samaras, Senior Full-Stack Engineer",
   shareDescription:
     "I build reliable, scalable digital products with clean code, thoughtful architecture, and great user experience.",
   url: "https://charisiss.gr",
@@ -179,7 +179,7 @@ export const meetPage = {
 
 export const linktreePage = {
   title: "Linktree | Charisiss",
-  description: "All Charisiss links in one place — website, socials, and booking.",
+  description: "All Charisiss links in one place: website, socials, and booking.",
 };
 
 export const linktreeLinks = [
