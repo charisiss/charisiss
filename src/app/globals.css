@@ -109,7 +109,7 @@ html.lenis body {
 }
 
 .marquee-track {
-  animation: marquee 32s linear infinite;
+  animation: marquee 64s linear infinite;
 }
 
 .marquee:hover .marquee-track {
