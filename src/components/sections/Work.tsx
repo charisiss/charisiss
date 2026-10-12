@@ -162,8 +162,20 @@ function ProjectRow({
         <div className="flex items-center justify-between gap-4 md:col-span-2 md:flex-col md:items-end">
           <span className="eyebrow">{project.role}</span>
           {project.href && (
-            <span className="flex size-11 items-center justify-center rounded-full border border-line text-lg transition-all duration-500 group-hover:-rotate-45 group-hover:border-accent group-hover:bg-accent group-hover:text-background md:hidden lg:flex">
-              →
+            <span className="flex size-11 items-center justify-center rounded-full border border-line transition-all duration-500 group-hover:-rotate-45 group-hover:border-accent group-hover:bg-accent group-hover:text-background md:hidden lg:flex">
+              <svg
+                aria-hidden
+                viewBox="0 0 16 16"
+                className="size-4"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="M3.5 8h9" />
+                <path d="M8.5 4l4 4-4 4" />
+              </svg>
             </span>
           )}
         </div>

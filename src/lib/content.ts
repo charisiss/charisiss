@@ -111,7 +111,7 @@ export const projects = [
     description:
       "Working closely with my team, we developed this unique tool, fully tailored to meet the specific needs of the project.",
     image: "/images/project-lemon.jpg",
-    href: null,
+    href: "https://thelemonproject.gr/",
   },
   {
     title: "Memorybox.gr",
