@@ -155,6 +155,7 @@ export async function createPaymentAction(formData: FormData) {
   const customerId = formString(formData, "customerId");
   const amount = eurosToCents(formString(formData, "amountEuros"));
   if (amount === null) throw new Error("Amount required");
+  const isRecurring = formData.get("isRecurring") === "on";
   await createPayment({
     customerId,
     amountCents: amount,
@@ -163,9 +164,13 @@ export async function createPaymentAction(formData: FormData) {
     method: formString(formData, "method") || null,
     reference: formString(formData, "reference"),
     note: formString(formData, "note"),
+    isRecurring,
+    recurrenceInterval: isRecurring
+      ? formString(formData, "recurrenceInterval") || "monthly"
+      : null,
   });
   revalidateErp(customerId);
-  await finish("/admin/payments", "Payment recorded");
+  await finish("/admin/payments", isRecurring ? "Recurring payment recorded" : "Payment recorded");
 }
 
 export async function deletePaymentAction(formData: FormData) {

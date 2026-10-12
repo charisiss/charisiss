@@ -35,7 +35,7 @@ export default async function CustomerDetailPage({
   const today = new Date().toISOString().slice(0, 10);
 
   return (
-    <div>
+    <div className="min-w-0">
       <PageHeader
         title={customer.name}
         description={customer.email ?? "No email on file"}
@@ -45,6 +45,27 @@ export default async function CustomerDetailPage({
           </Link>
         }
       />
+
+      {(customer.email || customer.phone) && (
+        <div className="mb-6 flex flex-wrap gap-2">
+          {customer.email ? (
+            <a
+              href={`mailto:${customer.email}`}
+              className="rounded-sm border border-line px-3 py-2 text-sm text-accent transition-colors hover:border-accent"
+            >
+              Email
+            </a>
+          ) : null}
+          {customer.phone ? (
+            <a
+              href={`tel:${customer.phone.replace(/\s+/g, "")}`}
+              className="rounded-sm border border-line px-3 py-2 text-sm text-accent transition-colors hover:border-accent"
+            >
+              Call
+            </a>
+          ) : null}
+        </div>
+      )}
 
       <div className="mb-8 grid gap-4 sm:grid-cols-3">
         <Panel>
@@ -65,46 +86,53 @@ export default async function CustomerDetailPage({
         </Panel>
       </div>
 
-      <Panel className="mb-6">
-        <h2 className="mb-4 text-sm font-semibold uppercase tracking-wider text-accent">
-          Edit customer
-        </h2>
-        <form action={updateCustomerAction} className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          <input type="hidden" name="id" value={customer.id} />
-          <input type="hidden" name="currency" value={customer.currency} />
-          <Field label="Name" name="name" required defaultValue={customer.name} />
-          <Field label="Email" name="email" type="email" defaultValue={customer.email} />
-          <Field label="Phone" name="phone" defaultValue={customer.phone} />
-          <Field label="VAT number" name="vatNumber" defaultValue={customer.vatNumber} />
-          <Field
-            label="Hourly rate (EUR)"
-            name="hourlyRateEuros"
-            type="number"
-            step="0.01"
-            defaultValue={centsToEuroInput(customer.defaultHourlyRateCents)}
-          />
-          <SelectField
-            label="Status"
-            name="status"
-            defaultValue={customer.status}
-            options={[
-              { value: "active", label: "Active" },
-              { value: "inactive", label: "Inactive" },
-              { value: "archived", label: "Archived" },
-            ]}
-          />
-          <Field label="Notes" name="notes" defaultValue={customer.notes} />
-          <div className="flex items-end gap-3">
-            <SubmitButton>Save</SubmitButton>
-          </div>
-        </form>
-        <form action={deleteCustomerAction} className="mt-4">
-          <input type="hidden" name="id" value={customer.id} />
-          <DangerButton>Delete customer (only if empty)</DangerButton>
-        </form>
-      </Panel>
+      <div className="mb-6 grid gap-6 lg:grid-cols-2">
+        <Panel>
+          <h2 className="mb-4 text-sm font-semibold uppercase tracking-wider text-accent">
+            Quick time / payment
+          </h2>
+          <form action={createTimeEntryAction} className="mb-6 grid gap-3">
+            <input type="hidden" name="customerId" value={customer.id} />
+            <Field label="Work date" name="workDate" type="date" required defaultValue={today} />
+            <Field label="Hours" name="hours" type="number" step="0.25" />
+            <Field label="Amount (EUR)" name="amountEuros" type="number" step="0.01" />
+            <Field label="Comment" name="description" />
+            <SubmitButton>Log time</SubmitButton>
+          </form>
+          <form action={createPaymentAction} className="grid gap-3">
+            <input type="hidden" name="customerId" value={customer.id} />
+            <input type="hidden" name="currency" value={customer.currency} />
+            <Field label="Paid on" name="paidOn" type="date" required defaultValue={today} />
+            <Field label="Amount (EUR)" name="amountEuros" type="number" step="0.01" required />
+            <SelectField
+              label="Method"
+              name="method"
+              defaultValue="bank"
+              options={[
+                { value: "bank", label: "Bank" },
+                { value: "cash", label: "Cash" },
+                { value: "card", label: "Card" },
+                { value: "paypal", label: "PayPal" },
+                { value: "other", label: "Other" },
+              ]}
+            />
+            <Field label="Reference" name="reference" />
+            <label className="flex items-center gap-2 text-sm text-muted">
+              <input type="checkbox" name="isRecurring" /> Recurring payment
+            </label>
+            <SelectField
+              label="Repeat"
+              name="recurrenceInterval"
+              defaultValue="monthly"
+              options={[
+                { value: "monthly", label: "Every month" },
+                { value: "yearly", label: "Every year" },
+              ]}
+            />
+            <SubmitButton>Record payment</SubmitButton>
+          </form>
+        </Panel>
 
-      <div className="grid gap-6 lg:grid-cols-2">
         <Panel>
           <h2 className="mb-4 text-sm font-semibold uppercase tracking-wider text-accent">
             Assets
@@ -160,43 +188,9 @@ export default async function CustomerDetailPage({
             </tbody>
           </Table>
         </Panel>
-
-        <Panel>
-          <h2 className="mb-4 text-sm font-semibold uppercase tracking-wider text-accent">
-            Quick time / payment
-          </h2>
-          <form action={createTimeEntryAction} className="mb-6 grid gap-3">
-            <input type="hidden" name="customerId" value={customer.id} />
-            <Field label="Work date" name="workDate" type="date" required defaultValue={today} />
-            <Field label="Hours" name="hours" type="number" step="0.25" />
-            <Field label="Amount (EUR)" name="amountEuros" type="number" step="0.01" />
-            <Field label="Comment" name="description" />
-            <SubmitButton>Log time</SubmitButton>
-          </form>
-          <form action={createPaymentAction} className="grid gap-3">
-            <input type="hidden" name="customerId" value={customer.id} />
-            <input type="hidden" name="currency" value={customer.currency} />
-            <Field label="Paid on" name="paidOn" type="date" required defaultValue={today} />
-            <Field label="Amount (EUR)" name="amountEuros" type="number" step="0.01" required />
-            <SelectField
-              label="Method"
-              name="method"
-              defaultValue="bank"
-              options={[
-                { value: "bank", label: "Bank" },
-                { value: "cash", label: "Cash" },
-                { value: "card", label: "Card" },
-                { value: "paypal", label: "PayPal" },
-                { value: "other", label: "Other" },
-              ]}
-            />
-            <Field label="Reference" name="reference" />
-            <SubmitButton>Record payment</SubmitButton>
-          </form>
-        </Panel>
       </div>
 
-      <Panel className="mt-6">
+      <Panel className="mb-6">
         <h2 className="mb-4 text-sm font-semibold uppercase tracking-wider text-accent">
           Time entries
         </h2>
@@ -226,7 +220,7 @@ export default async function CustomerDetailPage({
         </Table>
       </Panel>
 
-      <Panel className="mt-6">
+      <Panel className="mb-6">
         <h2 className="mb-4 text-sm font-semibold uppercase tracking-wider text-accent">
           Payments
         </h2>
@@ -236,6 +230,7 @@ export default async function CustomerDetailPage({
               <th className="py-2 pr-3 font-medium">Date</th>
               <th className="py-2 pr-3 font-medium">Amount</th>
               <th className="py-2 pr-3 font-medium">Method</th>
+              <th className="py-2 pr-3 font-medium">Recurring</th>
               <th className="py-2 font-medium">Reference</th>
             </tr>
           </thead>
@@ -247,11 +242,55 @@ export default async function CustomerDetailPage({
                   {formatMoney(payment.amountCents, payment.currency)}
                 </td>
                 <td className="py-2 pr-3">{payment.method ?? "—"}</td>
+                <td className="py-2 pr-3 text-muted">
+                  {payment.isRecurring
+                    ? `${payment.recurrenceInterval ?? "monthly"} · next ${payment.nextDueOn ?? "—"}`
+                    : "—"}
+                </td>
                 <td className="py-2 text-muted">{payment.reference ?? "—"}</td>
               </tr>
             ))}
           </tbody>
         </Table>
+      </Panel>
+
+      <Panel>
+        <h2 className="mb-4 text-sm font-semibold uppercase tracking-wider text-accent">
+          Edit customer
+        </h2>
+        <form action={updateCustomerAction} className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <input type="hidden" name="id" value={customer.id} />
+          <input type="hidden" name="currency" value={customer.currency} />
+          <Field label="Name" name="name" required defaultValue={customer.name} />
+          <Field label="Email" name="email" type="email" defaultValue={customer.email} />
+          <Field label="Phone" name="phone" defaultValue={customer.phone} />
+          <Field label="VAT number" name="vatNumber" defaultValue={customer.vatNumber} />
+          <Field
+            label="Hourly rate (EUR)"
+            name="hourlyRateEuros"
+            type="number"
+            step="0.01"
+            defaultValue={centsToEuroInput(customer.defaultHourlyRateCents)}
+          />
+          <SelectField
+            label="Status"
+            name="status"
+            defaultValue={customer.status}
+            options={[
+              { value: "active", label: "Active" },
+              { value: "inactive", label: "Inactive" },
+              { value: "archived", label: "Archived" },
+            ]}
+          />
+          <Field label="Notes" name="notes" defaultValue={customer.notes} />
+          <div className="flex items-end gap-3">
+            <SubmitButton>Save</SubmitButton>
+          </div>
+        </form>
+        <form action={deleteCustomerAction} className="mt-4">
+          <input type="hidden" name="id" value={customer.id} />
+          <DangerButton>Delete customer (only if empty)</DangerButton>
+        </form>
       </Panel>
     </div>
   );

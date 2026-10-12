@@ -70,14 +70,33 @@ export const timeEntryInputSchema = z
     { message: "Provide hours, amount, or both." },
   );
 
-export const paymentInputSchema = z.object({
-  customerId: z.string().uuid(),
-  amountCents: z.coerce.number().int().min(0),
-  currency: z.string().trim().min(3).max(3).default("EUR"),
-  paidOn: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
-  method: paymentMethodSchema.nullable().optional(),
-  reference: optionalText,
-  note: optionalText,
-});
+export const recurrenceIntervalSchema = z.enum(["monthly", "yearly"]);
+
+export const paymentInputSchema = z
+  .object({
+    customerId: z.string().uuid(),
+    amountCents: z.coerce.number().int().min(0),
+    currency: z.string().trim().min(3).max(3).default("EUR"),
+    paidOn: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+    method: paymentMethodSchema.nullable().optional(),
+    reference: optionalText,
+    note: optionalText,
+    isRecurring: z.coerce.boolean().default(false),
+    recurrenceInterval: recurrenceIntervalSchema.nullable().optional(),
+  })
+  .transform((data) => {
+    if (!data.isRecurring) {
+      return {
+        ...data,
+        isRecurring: false,
+        recurrenceInterval: null as null,
+      };
+    }
+    return {
+      ...data,
+      isRecurring: true,
+      recurrenceInterval: data.recurrenceInterval ?? ("monthly" as const),
+    };
+  });
 
 export const uuidSchema = z.string().uuid();

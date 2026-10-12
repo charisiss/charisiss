@@ -3,20 +3,77 @@ import { requireAdmin } from "@/lib/auth/admin";
 import { listCustomers } from "@/lib/erp/dal";
 import { formatMoney } from "@/lib/erp/money";
 import { createCustomerAction } from "../actions";
-import { Field, PageHeader, Panel, SelectField, SubmitButton, Table } from "../ui";
+import { Field, PageHeader, Panel, SelectField, SubmitButton } from "../ui";
 
 export default async function CustomersPage() {
   await requireAdmin();
   const rows = await listCustomers();
 
   return (
-    <div>
+    <div className="min-w-0">
       <PageHeader
         title="Customers"
         description="Client records for domains, hours, and payments."
       />
 
       <Panel className="mb-8">
+        <h2 className="mb-4 text-sm font-semibold uppercase tracking-wider text-accent">
+          Customers
+        </h2>
+        {rows.length === 0 ? (
+          <p className="text-sm text-muted">No customers yet.</p>
+        ) : (
+          <ul className="space-y-3">
+            {rows.map((customer) => (
+              <li
+                key={customer.id}
+                className="border border-line bg-background/60 transition-colors hover:border-accent/50"
+              >
+                <Link
+                  href={`/admin/customers/${customer.id}`}
+                  className="block px-4 py-4 sm:px-5 sm:py-5"
+                >
+                  <div className="flex items-start justify-between gap-3">
+                    <p className="font-display text-xl tracking-wide text-foreground sm:text-2xl">
+                      {customer.name}
+                    </p>
+                    <span className="shrink-0 capitalize text-xs uppercase tracking-wider text-muted">
+                      {customer.status}
+                    </span>
+                  </div>
+                  <p className="mt-2 text-sm text-muted">
+                    {customer.defaultHourlyRateCents != null
+                      ? `${formatMoney(customer.defaultHourlyRateCents, customer.currency)} / hr`
+                      : "No hourly rate"}
+                  </p>
+                </Link>
+                {(customer.email || customer.phone) && (
+                  <div className="flex flex-wrap gap-2 border-t border-line px-4 py-3 sm:px-5">
+                    {customer.email ? (
+                      <a
+                        href={`mailto:${customer.email}`}
+                        className="rounded-sm border border-line px-3 py-2 text-sm text-accent transition-colors hover:border-accent"
+                      >
+                        Email
+                      </a>
+                    ) : null}
+                    {customer.phone ? (
+                      <a
+                        href={`tel:${customer.phone.replace(/\s+/g, "")}`}
+                        className="rounded-sm border border-line px-3 py-2 text-sm text-accent transition-colors hover:border-accent"
+                      >
+                        Call
+                      </a>
+                    ) : null}
+                  </div>
+                )}
+              </li>
+            ))}
+          </ul>
+        )}
+      </Panel>
+
+      <Panel>
         <h2 className="mb-4 text-sm font-semibold uppercase tracking-wider text-accent">
           Add customer
         </h2>
@@ -42,40 +99,6 @@ export default async function CustomersPage() {
             <SubmitButton>Create</SubmitButton>
           </div>
         </form>
-      </Panel>
-
-      <Panel>
-        <Table>
-          <thead>
-            <tr className="border-b border-line text-muted">
-              <th className="py-2 pr-3 font-medium">Name</th>
-              <th className="py-2 pr-3 font-medium">Email</th>
-              <th className="py-2 pr-3 font-medium">Rate</th>
-              <th className="py-2 font-medium">Status</th>
-            </tr>
-          </thead>
-          <tbody>
-            {rows.map((customer) => (
-              <tr key={customer.id} className="border-b border-line/60">
-                <td className="py-2 pr-3">
-                  <Link href={`/admin/customers/${customer.id}`} className="hover:text-accent">
-                    {customer.name}
-                  </Link>
-                </td>
-                <td className="py-2 pr-3 text-muted">{customer.email ?? "—"}</td>
-                <td className="py-2 pr-3">
-                  {customer.defaultHourlyRateCents != null
-                    ? formatMoney(customer.defaultHourlyRateCents, customer.currency)
-                    : "—"}
-                </td>
-                <td className="py-2 capitalize text-muted">{customer.status}</td>
-              </tr>
-            ))}
-          </tbody>
-        </Table>
-        {rows.length === 0 ? (
-          <p className="mt-4 text-sm text-muted">No customers yet.</p>
-        ) : null}
       </Panel>
     </div>
   );

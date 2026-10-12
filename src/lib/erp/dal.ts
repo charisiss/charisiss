@@ -4,6 +4,7 @@ import { and, asc, desc, eq, gte, lte, sql } from "drizzle-orm";
 import { requireAdmin, type AdminUser } from "@/lib/auth/admin";
 import { db } from "@/lib/db";
 import { assets, auditLog, customers, payments, timeEntries } from "@/lib/db/schema";
+import { addMonthsIso } from "./money";
 import {
   assetInputSchema,
   customerInputSchema,
@@ -97,11 +98,16 @@ export async function getDashboard() {
     db.select({ count: sql<number>`count(*)::int` }).from(customers),
   ]);
 
+  const owedCents = unbilled.reduce((sum, row) => sum + Number(row.amountCents || 0), 0);
+  const owedCurrency = unbilled[0]?.currency ?? "EUR";
+
   return {
     expiringAssets,
     unbilled,
     recentPayments,
     customerCount: customerCount[0]?.count ?? 0,
+    owedCents,
+    owedCurrency,
   };
 }
 
@@ -416,6 +422,9 @@ export async function listPayments() {
       method: payments.method,
       reference: payments.reference,
       note: payments.note,
+      isRecurring: payments.isRecurring,
+      recurrenceInterval: payments.recurrenceInterval,
+      nextDueOn: payments.nextDueOn,
       customerId: payments.customerId,
       customerName: customers.name,
     })
@@ -428,6 +437,11 @@ export async function listPayments() {
 export async function createPayment(raw: unknown) {
   const admin = await requireAdmin();
   const input = paymentInputSchema.parse(raw);
+  const interval = input.isRecurring ? input.recurrenceInterval : null;
+  const nextDueOn =
+    input.isRecurring && interval
+      ? addMonthsIso(input.paidOn, interval === "yearly" ? 12 : 1)
+      : null;
   const [row] = await db
     .insert(payments)
     .values({
@@ -438,9 +452,15 @@ export async function createPayment(raw: unknown) {
       method: input.method ?? null,
       reference: input.reference ?? null,
       note: input.note ?? null,
+      isRecurring: input.isRecurring,
+      recurrenceInterval: interval,
+      nextDueOn,
     })
     .returning();
-  await writeAudit(admin, "create", "payment", row.id, { amountCents: row.amountCents });
+  await writeAudit(admin, "create", "payment", row.id, {
+    amountCents: row.amountCents,
+    isRecurring: row.isRecurring,
+  });
   return row;
 }
 

@@ -48,6 +48,18 @@ export default async function PaymentsPage() {
           />
           <Field label="Reference" name="reference" />
           <Field label="Note" name="note" />
+          <label className="flex items-center gap-2 text-sm text-muted sm:col-span-2">
+            <input type="checkbox" name="isRecurring" /> Recurring (same amount every period)
+          </label>
+          <SelectField
+            label="Repeat"
+            name="recurrenceInterval"
+            defaultValue="monthly"
+            options={[
+              { value: "monthly", label: "Every month" },
+              { value: "yearly", label: "Every year" },
+            ]}
+          />
           <input type="hidden" name="currency" value="EUR" />
           <div className="flex items-end">
             <SubmitButton>Save payment</SubmitButton>
@@ -63,6 +75,7 @@ export default async function PaymentsPage() {
               <th className="py-2 pr-3 font-medium">Customer</th>
               <th className="py-2 pr-3 font-medium">Amount</th>
               <th className="py-2 pr-3 font-medium">Method</th>
+              <th className="py-2 pr-3 font-medium">Recurring</th>
               <th className="py-2 pr-3 font-medium">Reference</th>
               <th className="py-2 font-medium" />
             </tr>
@@ -83,6 +96,11 @@ export default async function PaymentsPage() {
                   {formatMoney(payment.amountCents, payment.currency)}
                 </td>
                 <td className="py-2 pr-3">{payment.method ?? "—"}</td>
+                <td className="py-2 pr-3 text-muted">
+                  {payment.isRecurring
+                    ? `${payment.recurrenceInterval ?? "monthly"} · next ${payment.nextDueOn ?? "—"}`
+                    : "—"}
+                </td>
                 <td className="py-2 pr-3 text-muted">{payment.reference ?? "—"}</td>
                 <td className="py-2">
                   <form action={deletePaymentAction}>

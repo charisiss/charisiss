@@ -6,6 +6,13 @@ export function formatMoney(cents: number | null | undefined, currency = "EUR") 
   }).format(cents / 100);
 }
 
+/** Add calendar months to an ISO date (YYYY-MM-DD), noon UTC to avoid DST edge cases. */
+export function addMonthsIso(isoDate: string, months: number) {
+  const date = new Date(`${isoDate}T12:00:00.000Z`);
+  date.setUTCMonth(date.getUTCMonth() + months);
+  return date.toISOString().slice(0, 10);
+}
+
 export function eurosToCents(value: string | number | null | undefined): number | null {
   if (value === null || value === undefined || value === "") return null;
   const n = typeof value === "number" ? value : Number.parseFloat(String(value).replace(",", "."));

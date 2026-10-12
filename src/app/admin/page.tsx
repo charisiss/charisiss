@@ -15,10 +15,16 @@ export default async function AdminDashboardPage() {
         description="Expiring domains/servers, unbilled work, and recent payments."
       />
 
-      <div className="mb-8 grid min-w-0 gap-4 sm:grid-cols-3">
+      <div className="mb-8 grid min-w-0 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <Panel>
           <p className="text-xs uppercase tracking-wider text-muted">Customers</p>
           <p className="mt-2 font-display text-3xl">{data.customerCount}</p>
+        </Panel>
+        <Panel>
+          <p className="text-xs uppercase tracking-wider text-muted">They owe you</p>
+          <p className="mt-2 font-display text-3xl">
+            {formatMoney(data.owedCents, data.owedCurrency)}
+          </p>
         </Panel>
         <Panel>
           <p className="text-xs uppercase tracking-wider text-muted">Expiring ≤90d</p>

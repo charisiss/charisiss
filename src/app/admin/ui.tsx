@@ -1,4 +1,7 @@
 import type { ReactNode } from "react";
+import { DangerButton, SubmitButton } from "./pending-button";
+
+export { DangerButton, SubmitButton };
 
 const controlClass =
   "w-full rounded-sm border border-line bg-background px-3 py-2.5 text-base text-foreground outline-none focus:border-accent sm:py-2 sm:text-sm";
@@ -93,28 +96,6 @@ export function SelectField({
         ))}
       </select>
     </Field>
-  );
-}
-
-export function SubmitButton({ children }: { children: ReactNode }) {
-  return (
-    <button
-      type="submit"
-      className="w-full rounded-sm bg-accent px-4 py-2.5 text-sm font-semibold text-background transition-opacity hover:opacity-90 sm:w-auto sm:py-2"
-    >
-      {children}
-    </button>
-  );
-}
-
-export function DangerButton({ children }: { children: ReactNode }) {
-  return (
-    <button
-      type="submit"
-      className="rounded-sm border border-red-500/40 px-3 py-2 text-xs uppercase tracking-wider text-red-300 transition-colors hover:border-red-400 hover:text-red-200 sm:py-1.5"
-    >
-      {children}
-    </button>
   );
 }
 

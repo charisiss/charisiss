@@ -101,9 +101,12 @@ export default async function TimePage() {
                       <option value="billed">Billed</option>
                       <option value="paid">Paid</option>
                     </select>
-                    <button type="submit" className="text-xs text-accent hover:underline">
+                    <SubmitButton
+                      pendingLabel="…"
+                      className="text-xs text-accent hover:underline disabled:opacity-60"
+                    >
                       Save
-                    </button>
+                    </SubmitButton>
                   </form>
                 </td>
                 <td className="py-2 pr-3 text-muted">{entry.description ?? "—"}</td>
