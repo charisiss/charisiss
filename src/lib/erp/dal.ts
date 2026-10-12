@@ -350,6 +350,9 @@ export async function listTimeEntries() {
       amountCents: timeEntries.amountCents,
       description: timeEntries.description,
       billingStatus: timeEntries.billingStatus,
+      isRecurring: timeEntries.isRecurring,
+      recurrenceInterval: timeEntries.recurrenceInterval,
+      nextDueOn: timeEntries.nextDueOn,
       customerId: timeEntries.customerId,
       customerName: customers.name,
       currency: customers.currency,
@@ -372,6 +375,12 @@ export async function createTimeEntry(raw: unknown) {
     customer.defaultHourlyRateCents,
   );
 
+  const interval = input.isRecurring ? input.recurrenceInterval : null;
+  const nextDueOn =
+    input.isRecurring && interval
+      ? addMonthsIso(input.workDate, interval === "yearly" ? 12 : 1)
+      : null;
+
   const [row] = await db
     .insert(timeEntries)
     .values({
@@ -381,9 +390,14 @@ export async function createTimeEntry(raw: unknown) {
       amountCents,
       description: input.description ?? null,
       billingStatus: input.billingStatus,
+      isRecurring: input.isRecurring,
+      recurrenceInterval: interval,
+      nextDueOn,
     })
     .returning();
-  await writeAudit(admin, "create", "time_entry", row.id);
+  await writeAudit(admin, "create", "time_entry", row.id, {
+    isRecurring: row.isRecurring,
+  });
   return row;
 }
 
@@ -422,9 +436,6 @@ export async function listPayments() {
       method: payments.method,
       reference: payments.reference,
       note: payments.note,
-      isRecurring: payments.isRecurring,
-      recurrenceInterval: payments.recurrenceInterval,
-      nextDueOn: payments.nextDueOn,
       customerId: payments.customerId,
       customerName: customers.name,
     })
@@ -437,11 +448,6 @@ export async function listPayments() {
 export async function createPayment(raw: unknown) {
   const admin = await requireAdmin();
   const input = paymentInputSchema.parse(raw);
-  const interval = input.isRecurring ? input.recurrenceInterval : null;
-  const nextDueOn =
-    input.isRecurring && interval
-      ? addMonthsIso(input.paidOn, interval === "yearly" ? 12 : 1)
-      : null;
   const [row] = await db
     .insert(payments)
     .values({
@@ -452,14 +458,10 @@ export async function createPayment(raw: unknown) {
       method: input.method ?? null,
       reference: input.reference ?? null,
       note: input.note ?? null,
-      isRecurring: input.isRecurring,
-      recurrenceInterval: interval,
-      nextDueOn,
     })
     .returning();
   await writeAudit(admin, "create", "payment", row.id, {
     amountCents: row.amountCents,
-    isRecurring: row.isRecurring,
   });
   return row;
 }

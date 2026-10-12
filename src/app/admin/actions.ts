@@ -129,6 +129,7 @@ export async function createTimeEntryAction(formData: FormData) {
   const customerId = formString(formData, "customerId");
   const hoursRaw = formString(formData, "hours");
   const amountRaw = formString(formData, "amountEuros");
+  const isRecurring = formData.get("isRecurring") === "on";
   await createTimeEntry({
     customerId,
     workDate: formString(formData, "workDate"),
@@ -136,9 +137,16 @@ export async function createTimeEntryAction(formData: FormData) {
     amountCents: eurosToCents(amountRaw),
     description: formString(formData, "description"),
     billingStatus: formString(formData, "billingStatus") || "unbilled",
+    isRecurring,
+    recurrenceInterval: isRecurring
+      ? formString(formData, "recurrenceInterval") || "monthly"
+      : null,
   });
   revalidateErp(customerId);
-  await finish(returnPath(formData, "/admin/time"), "Time entry added");
+  await finish(
+    returnPath(formData, "/admin/time"),
+    isRecurring ? "Recurring time entry added" : "Time entry added",
+  );
 }
 
 export async function updateTimeEntryStatusAction(formData: FormData) {
@@ -162,7 +170,6 @@ export async function createPaymentAction(formData: FormData) {
   const customerId = formString(formData, "customerId");
   const amount = eurosToCents(formString(formData, "amountEuros"));
   if (amount === null) throw new Error("Amount required");
-  const isRecurring = formData.get("isRecurring") === "on";
   await createPayment({
     customerId,
     amountCents: amount,
@@ -171,16 +178,9 @@ export async function createPaymentAction(formData: FormData) {
     method: formString(formData, "method") || null,
     reference: formString(formData, "reference"),
     note: formString(formData, "note"),
-    isRecurring,
-    recurrenceInterval: isRecurring
-      ? formString(formData, "recurrenceInterval") || "monthly"
-      : null,
   });
   revalidateErp(customerId);
-  await finish(
-    returnPath(formData, "/admin/payments"),
-    isRecurring ? "Recurring payment recorded" : "Payment recorded",
-  );
+  await finish(returnPath(formData, "/admin/payments"), "Payment recorded");
 }
 
 export async function deletePaymentAction(formData: FormData) {
@@ -188,5 +188,5 @@ export async function deletePaymentAction(formData: FormData) {
   const customerId = formString(formData, "customerId");
   await deletePayment(id);
   revalidateErp(customerId || undefined);
-  await finish("/admin/payments", "Payment deleted");
+  await finish(returnPath(formData, "/admin/payments"), "Payment deleted");
 }

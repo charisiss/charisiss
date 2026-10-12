@@ -95,6 +95,7 @@ export default async function AssetsPage() {
                   <form action={deleteAssetAction}>
                     <input type="hidden" name="id" value={asset.id} />
                     <input type="hidden" name="customerId" value={asset.customerId} />
+                    <input type="hidden" name="returnTo" value="/admin/assets" />
                     <DangerButton>Delete</DangerButton>
                   </form>
                 </td>

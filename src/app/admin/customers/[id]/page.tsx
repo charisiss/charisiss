@@ -7,7 +7,9 @@ import {
   createAssetAction,
   createPaymentAction,
   createTimeEntryAction,
+  deleteAssetAction,
   deleteCustomerAction,
+  deletePaymentAction,
   updateCustomerAction,
 } from "../../actions";
 import {
@@ -113,6 +115,18 @@ export default async function CustomerDetailPage({
             <Field label="Hours" name="hours" type="number" step="0.25" />
             <Field label="Amount (EUR)" name="amountEuros" type="number" step="0.01" />
             <Field label="Comment" name="description" />
+            <label className="flex items-center gap-2 text-sm text-muted">
+              <input type="checkbox" name="isRecurring" /> Recurring work
+            </label>
+            <SelectField
+              label="Repeat"
+              name="recurrenceInterval"
+              defaultValue="monthly"
+              options={[
+                { value: "monthly", label: "Every month" },
+                { value: "yearly", label: "Every year" },
+              ]}
+            />
             <SubmitButton>Log time</SubmitButton>
           </form>
           <form action={createPaymentAction} className="grid gap-3">
@@ -134,18 +148,6 @@ export default async function CustomerDetailPage({
               ]}
             />
             <Field label="Reference" name="reference" />
-            <label className="flex items-center gap-2 text-sm text-muted">
-              <input type="checkbox" name="isRecurring" /> Recurring payment
-            </label>
-            <SelectField
-              label="Repeat"
-              name="recurrenceInterval"
-              defaultValue="monthly"
-              options={[
-                { value: "monthly", label: "Every month" },
-                { value: "yearly", label: "Every year" },
-              ]}
-            />
             <SubmitButton>Record payment</SubmitButton>
           </form>
         </Panel>
@@ -187,7 +189,8 @@ export default async function CustomerDetailPage({
               <tr className="border-b border-line text-muted">
                 <th className="py-2 pr-3 font-medium">Label</th>
                 <th className="py-2 pr-3 font-medium">Expires</th>
-                <th className="py-2 font-medium">In</th>
+                <th className="py-2 pr-3 font-medium">In</th>
+                <th className="py-2 font-medium" />
               </tr>
             </thead>
             <tbody>
@@ -198,13 +201,28 @@ export default async function CustomerDetailPage({
                     <span className="ml-2 text-xs text-muted">{asset.kind}</span>
                   </td>
                   <td className="py-2 pr-3">{asset.expiresOn ?? "—"}</td>
-                  <td className="py-2">
+                  <td className="py-2 pr-3">
                     <ExpiryBadge days={daysUntil(asset.expiresOn)} />
+                  </td>
+                  <td className="py-2">
+                    <form action={deleteAssetAction}>
+                      <input type="hidden" name="id" value={asset.id} />
+                      <input type="hidden" name="customerId" value={customer.id} />
+                      <input
+                        type="hidden"
+                        name="returnTo"
+                        value={`/admin/customers/${customer.id}`}
+                      />
+                      <DangerButton>Delete</DangerButton>
+                    </form>
                   </td>
                 </tr>
               ))}
             </tbody>
           </Table>
+          {assets.length === 0 ? (
+            <p className="mt-3 text-sm text-muted">No assets yet.</p>
+          ) : null}
         </Panel>
       </div>
 
@@ -219,6 +237,7 @@ export default async function CustomerDetailPage({
               <th className="py-2 pr-3 font-medium">Hours</th>
               <th className="py-2 pr-3 font-medium">Amount</th>
               <th className="py-2 pr-3 font-medium">Status</th>
+              <th className="py-2 pr-3 font-medium">Recurring</th>
               <th className="py-2 font-medium">Note</th>
             </tr>
           </thead>
@@ -231,6 +250,11 @@ export default async function CustomerDetailPage({
                   {formatMoney(entry.amountCents, customer.currency)}
                 </td>
                 <td className="py-2 pr-3 capitalize">{entry.billingStatus}</td>
+                <td className="py-2 pr-3 text-muted">
+                  {entry.isRecurring
+                    ? `${entry.recurrenceInterval ?? "monthly"} · next ${entry.nextDueOn ?? "—"}`
+                    : "—"}
+                </td>
                 <td className="py-2 text-muted">{entry.description ?? "—"}</td>
               </tr>
             ))}
@@ -248,8 +272,8 @@ export default async function CustomerDetailPage({
               <th className="py-2 pr-3 font-medium">Date</th>
               <th className="py-2 pr-3 font-medium">Amount</th>
               <th className="py-2 pr-3 font-medium">Method</th>
-              <th className="py-2 pr-3 font-medium">Recurring</th>
-              <th className="py-2 font-medium">Reference</th>
+              <th className="py-2 pr-3 font-medium">Reference</th>
+              <th className="py-2 font-medium" />
             </tr>
           </thead>
           <tbody>
@@ -260,12 +284,19 @@ export default async function CustomerDetailPage({
                   {formatMoney(payment.amountCents, payment.currency)}
                 </td>
                 <td className="py-2 pr-3">{payment.method ?? "—"}</td>
-                <td className="py-2 pr-3 text-muted">
-                  {payment.isRecurring
-                    ? `${payment.recurrenceInterval ?? "monthly"} · next ${payment.nextDueOn ?? "—"}`
-                    : "—"}
+                <td className="py-2 pr-3 text-muted">{payment.reference ?? "—"}</td>
+                <td className="py-2">
+                  <form action={deletePaymentAction}>
+                    <input type="hidden" name="id" value={payment.id} />
+                    <input type="hidden" name="customerId" value={customer.id} />
+                    <input
+                      type="hidden"
+                      name="returnTo"
+                      value={`/admin/customers/${customer.id}`}
+                    />
+                    <DangerButton>Delete</DangerButton>
+                  </form>
                 </td>
-                <td className="py-2 text-muted">{payment.reference ?? "—"}</td>
               </tr>
             ))}
           </tbody>

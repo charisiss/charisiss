@@ -54,6 +54,8 @@ export const assetInputSchema = z.object({
   notes: optionalText,
 });
 
+export const recurrenceIntervalSchema = z.enum(["monthly", "yearly"]);
+
 export const timeEntryInputSchema = z
   .object({
     customerId: z.string().uuid(),
@@ -62,28 +64,15 @@ export const timeEntryInputSchema = z
     amountCents: centsSchema,
     description: optionalText,
     billingStatus: billingStatusSchema.default("unbilled"),
+    isRecurring: z.coerce.boolean().default(false),
+    recurrenceInterval: recurrenceIntervalSchema.nullable().optional(),
   })
   .refine(
     (data) =>
       (data.hours !== null && data.hours !== undefined) ||
       (data.amountCents !== null && data.amountCents !== undefined),
     { message: "Provide hours, amount, or both." },
-  );
-
-export const recurrenceIntervalSchema = z.enum(["monthly", "yearly"]);
-
-export const paymentInputSchema = z
-  .object({
-    customerId: z.string().uuid(),
-    amountCents: z.coerce.number().int().min(0),
-    currency: z.string().trim().min(3).max(3).default("EUR"),
-    paidOn: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
-    method: paymentMethodSchema.nullable().optional(),
-    reference: optionalText,
-    note: optionalText,
-    isRecurring: z.coerce.boolean().default(false),
-    recurrenceInterval: recurrenceIntervalSchema.nullable().optional(),
-  })
+  )
   .transform((data) => {
     if (!data.isRecurring) {
       return {
@@ -98,5 +87,15 @@ export const paymentInputSchema = z
       recurrenceInterval: data.recurrenceInterval ?? ("monthly" as const),
     };
   });
+
+export const paymentInputSchema = z.object({
+  customerId: z.string().uuid(),
+  amountCents: z.coerce.number().int().min(0),
+  currency: z.string().trim().min(3).max(3).default("EUR"),
+  paidOn: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+  method: paymentMethodSchema.nullable().optional(),
+  reference: optionalText,
+  note: optionalText,
+});
 
 export const uuidSchema = z.string().uuid();

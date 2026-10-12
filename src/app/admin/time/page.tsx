@@ -2,13 +2,13 @@ import Link from "next/link";
 import { requireAdmin } from "@/lib/auth/admin";
 import { listCustomers, listTimeEntries } from "@/lib/erp/dal";
 import { formatMoney } from "@/lib/erp/money";
+import { AutoSubmitSelect } from "../auto-submit-select";
 import {
   createTimeEntryAction,
   deleteTimeEntryAction,
   updateTimeEntryStatusAction,
 } from "../actions";
 import {
-  DangerButton,
   Field,
   PageHeader,
   Panel,
@@ -16,6 +16,12 @@ import {
   SubmitButton,
   Table,
 } from "../ui";
+
+const statusOptions = [
+  { value: "unbilled", label: "Unbilled" },
+  { value: "billed", label: "Billed" },
+  { value: "paid", label: "Paid" },
+];
 
 export default async function TimePage() {
   await requireAdmin();
@@ -47,10 +53,18 @@ export default async function TimePage() {
             label="Status"
             name="billingStatus"
             defaultValue="unbilled"
+            options={statusOptions}
+          />
+          <label className="flex items-center gap-2 text-sm text-muted">
+            <input type="checkbox" name="isRecurring" /> Recurring
+          </label>
+          <SelectField
+            label="Repeat"
+            name="recurrenceInterval"
+            defaultValue="monthly"
             options={[
-              { value: "unbilled", label: "Unbilled" },
-              { value: "billed", label: "Billed" },
-              { value: "paid", label: "Paid" },
+              { value: "monthly", label: "Every month" },
+              { value: "yearly", label: "Every year" },
             ]}
           />
           <div className="flex items-end">
@@ -74,9 +88,9 @@ export default async function TimePage() {
           </thead>
           <tbody>
             {rows.map((entry) => (
-              <tr key={entry.id} className="border-b border-line/60 align-top">
-                <td className="py-2 pr-3">{entry.workDate}</td>
-                <td className="py-2 pr-3">
+              <tr key={entry.id} className="border-b border-line/60">
+                <td className="py-2.5 pr-3 whitespace-nowrap">{entry.workDate}</td>
+                <td className="py-2.5 pr-3">
                   <Link
                     href={`/admin/customers/${entry.customerId}`}
                     className="hover:text-accent"
@@ -84,37 +98,40 @@ export default async function TimePage() {
                     {entry.customerName}
                   </Link>
                 </td>
-                <td className="py-2 pr-3">{entry.hours ?? "—"}</td>
-                <td className="py-2 pr-3">
+                <td className="py-2.5 pr-3">{entry.hours ?? "—"}</td>
+                <td className="py-2.5 pr-3 whitespace-nowrap">
                   {formatMoney(entry.amountCents, entry.currency)}
                 </td>
-                <td className="py-2 pr-3">
-                  <form action={updateTimeEntryStatusAction} className="flex gap-2">
+                <td className="py-2.5 pr-3">
+                  <form action={updateTimeEntryStatusAction}>
                     <input type="hidden" name="id" value={entry.id} />
                     <input type="hidden" name="customerId" value={entry.customerId} />
-                    <select
+                    <AutoSubmitSelect
                       name="billingStatus"
                       defaultValue={entry.billingStatus}
-                      className="rounded-sm border border-line bg-background px-2 py-1 text-xs"
-                    >
-                      <option value="unbilled">Unbilled</option>
-                      <option value="billed">Billed</option>
-                      <option value="paid">Paid</option>
-                    </select>
-                    <SubmitButton
-                      pendingLabel="…"
-                      className="text-xs text-accent hover:underline disabled:opacity-60"
-                    >
-                      Save
-                    </SubmitButton>
+                      options={statusOptions}
+                    />
                   </form>
                 </td>
-                <td className="py-2 pr-3 text-muted">{entry.description ?? "—"}</td>
-                <td className="py-2">
+                <td className="py-2.5 pr-3 text-muted">
+                  <span>{entry.description ?? "—"}</span>
+                  {entry.isRecurring ? (
+                    <span className="mt-0.5 block text-xs">
+                      {entry.recurrenceInterval ?? "monthly"} · next{" "}
+                      {entry.nextDueOn ?? "—"}
+                    </span>
+                  ) : null}
+                </td>
+                <td className="py-2.5 text-right">
                   <form action={deleteTimeEntryAction}>
                     <input type="hidden" name="id" value={entry.id} />
                     <input type="hidden" name="customerId" value={entry.customerId} />
-                    <DangerButton>Delete</DangerButton>
+                    <SubmitButton
+                      pendingLabel="…"
+                      className="text-xs text-muted underline-offset-2 hover:text-red-300 hover:underline disabled:opacity-60"
+                    >
+                      Delete
+                    </SubmitButton>
                   </form>
                 </td>
               </tr>
