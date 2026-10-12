@@ -31,12 +31,17 @@ export function AdminNav({ email }: { email: string }) {
     const onKey = (event: KeyboardEvent) => {
       if (event.key === "Escape") setOpen(false);
     };
+    const previous = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
     window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
+    return () => {
+      document.body.style.overflow = previous;
+      window.removeEventListener("keydown", onKey);
+    };
   }, [open]);
 
   return (
-    <header className="sticky top-0 z-40 border-b border-line bg-surface/90 backdrop-blur-md">
+    <header className="fixed inset-x-0 top-0 z-40 border-b border-line bg-surface/95 backdrop-blur-md">
       <div className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 py-3 sm:px-6 sm:py-4">
         <Link href="/admin" className="wordmark shrink-0 text-sm text-accent">
           Charisiss ERP

@@ -19,9 +19,18 @@ export default async function AdminLayout({
   const [admin, flash] = await Promise.all([getAdminOrNull(), peekFlash()]);
 
   return (
-    <div className="min-h-dvh bg-background text-foreground" data-lenis-prevent>
+    <div
+      className="min-h-dvh max-w-[100vw] overflow-x-clip bg-background text-foreground"
+      data-lenis-prevent
+    >
       {admin ? <AdminNav email={admin.email} /> : null}
-      <main className="mx-auto max-w-6xl px-4 py-6 sm:px-6 sm:py-8">{children}</main>
+      <main
+        className={`mx-auto min-w-0 max-w-6xl px-4 py-6 sm:px-6 sm:py-8 ${
+          admin ? "pt-[4.75rem] sm:pt-[5.25rem]" : ""
+        }`}
+      >
+        {children}
+      </main>
       <AdminToast key={flash?.id ?? "empty"} initial={flash} />
     </div>
   );

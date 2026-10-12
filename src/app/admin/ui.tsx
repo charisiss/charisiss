@@ -30,7 +30,9 @@ export function PageHeader({
 
 export function Panel({ children, className = "" }: { children: ReactNode; className?: string }) {
   return (
-    <section className={`border border-line bg-surface/60 p-3.5 sm:p-5 ${className}`}>
+    <section
+      className={`min-w-0 border border-line bg-surface/60 p-3.5 sm:p-5 ${className}`}
+    >
       {children}
     </section>
   );
@@ -118,8 +120,8 @@ export function DangerButton({ children }: { children: ReactNode }) {
 
 export function Table({ children }: { children: ReactNode }) {
   return (
-    <div className="-mx-3.5 overflow-x-auto overscroll-x-contain px-3.5 sm:mx-0 sm:px-0">
-      <table className="w-full min-w-[36rem] border-collapse text-left text-sm">{children}</table>
+    <div className="max-w-full overflow-x-auto overscroll-x-contain">
+      <table className="w-full min-w-[32rem] border-collapse text-left text-sm">{children}</table>
     </div>
   );
 }

@@ -9,13 +9,13 @@ export default async function AdminDashboardPage() {
   const data = await getDashboard();
 
   return (
-    <div>
+    <div className="min-w-0">
       <PageHeader
         title="Dashboard"
         description="Expiring domains/servers, unbilled work, and recent payments."
       />
 
-      <div className="mb-8 grid gap-4 sm:grid-cols-3">
+      <div className="mb-8 grid min-w-0 gap-4 sm:grid-cols-3">
         <Panel>
           <p className="text-xs uppercase tracking-wider text-muted">Customers</p>
           <p className="mt-2 font-display text-3xl">{data.customerCount}</p>
@@ -30,7 +30,7 @@ export default async function AdminDashboardPage() {
         </Panel>
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-2">
+      <div className="grid min-w-0 gap-6 lg:grid-cols-2">
         <Panel>
           <h2 className="mb-4 text-sm font-semibold uppercase tracking-wider text-accent">
             Expiring assets
