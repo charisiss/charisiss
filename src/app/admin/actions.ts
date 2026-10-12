@@ -37,6 +37,13 @@ async function finish(path: string, message: string) {
   redirect(path);
 }
 
+/** Optional hidden `returnTo` from forms; only allow /admin paths. */
+function returnPath(formData: FormData, fallback: string) {
+  const returnTo = formString(formData, "returnTo");
+  if (returnTo.startsWith("/admin/") || returnTo === "/admin") return returnTo;
+  return fallback;
+}
+
 export async function createCustomerAction(formData: FormData) {
   const rate = eurosToCents(formString(formData, "hourlyRateEuros"));
   const customer = await createCustomer({
@@ -90,7 +97,7 @@ export async function createAssetAction(formData: FormData) {
     notes: formString(formData, "notes"),
   });
   revalidateErp(customerId);
-  await finish("/admin/assets", "Asset added");
+  await finish(returnPath(formData, "/admin/assets"), "Asset added");
 }
 
 export async function updateAssetAction(formData: FormData) {
@@ -107,7 +114,7 @@ export async function updateAssetAction(formData: FormData) {
     notes: formString(formData, "notes"),
   });
   revalidateErp(customerId);
-  await finish("/admin/assets", "Asset saved");
+  await finish(returnPath(formData, "/admin/assets"), "Asset saved");
 }
 
 export async function deleteAssetAction(formData: FormData) {
@@ -115,7 +122,7 @@ export async function deleteAssetAction(formData: FormData) {
   const customerId = formString(formData, "customerId");
   await deleteAsset(id);
   revalidateErp(customerId || undefined);
-  await finish("/admin/assets", "Asset deleted");
+  await finish(returnPath(formData, "/admin/assets"), "Asset deleted");
 }
 
 export async function createTimeEntryAction(formData: FormData) {
@@ -131,7 +138,7 @@ export async function createTimeEntryAction(formData: FormData) {
     billingStatus: formString(formData, "billingStatus") || "unbilled",
   });
   revalidateErp(customerId);
-  await finish("/admin/time", "Time entry added");
+  await finish(returnPath(formData, "/admin/time"), "Time entry added");
 }
 
 export async function updateTimeEntryStatusAction(formData: FormData) {
@@ -170,7 +177,10 @@ export async function createPaymentAction(formData: FormData) {
       : null,
   });
   revalidateErp(customerId);
-  await finish("/admin/payments", isRecurring ? "Recurring payment recorded" : "Payment recorded");
+  await finish(
+    returnPath(formData, "/admin/payments"),
+    isRecurring ? "Recurring payment recorded" : "Payment recorded",
+  );
 }
 
 export async function deletePaymentAction(formData: FormData) {

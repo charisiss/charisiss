@@ -68,22 +68,37 @@ export default async function CustomerDetailPage({
       )}
 
       <div className="mb-8 grid gap-4 sm:grid-cols-3">
-        <Panel>
-          <p className="text-xs uppercase tracking-wider text-muted">Unbilled</p>
-          <p className="mt-2 font-display text-2xl">
-            {formatMoney(unbilledCents, customer.currency)}
-          </p>
-        </Panel>
-        <Panel>
-          <p className="text-xs uppercase tracking-wider text-muted">Paid total</p>
-          <p className="mt-2 font-display text-2xl">
-            {formatMoney(paidCents, customer.currency)}
-          </p>
-        </Panel>
-        <Panel>
-          <p className="text-xs uppercase tracking-wider text-muted">Assets</p>
-          <p className="mt-2 font-display text-2xl">{assets.length}</p>
-        </Panel>
+        <a
+          href="#payments"
+          className="block outline-none transition-colors hover:border-accent focus-visible:border-accent"
+        >
+          <Panel className="h-full border-inherit hover:border-accent">
+            <p className="text-xs uppercase tracking-wider text-muted">Unbilled</p>
+            <p className="mt-2 font-display text-2xl">
+              {formatMoney(unbilledCents, customer.currency)}
+            </p>
+          </Panel>
+        </a>
+        <a
+          href="#payments"
+          className="block outline-none transition-colors hover:border-accent focus-visible:border-accent"
+        >
+          <Panel className="h-full border-inherit hover:border-accent">
+            <p className="text-xs uppercase tracking-wider text-muted">Paid total</p>
+            <p className="mt-2 font-display text-2xl">
+              {formatMoney(paidCents, customer.currency)}
+            </p>
+          </Panel>
+        </a>
+        <a
+          href="#assets"
+          className="block outline-none transition-colors hover:border-accent focus-visible:border-accent"
+        >
+          <Panel className="h-full border-inherit hover:border-accent">
+            <p className="text-xs uppercase tracking-wider text-muted">Assets</p>
+            <p className="mt-2 font-display text-2xl">{assets.length}</p>
+          </Panel>
+        </a>
       </div>
 
       <div className="mb-6 grid gap-6 lg:grid-cols-2">
@@ -93,6 +108,7 @@ export default async function CustomerDetailPage({
           </h2>
           <form action={createTimeEntryAction} className="mb-6 grid gap-3">
             <input type="hidden" name="customerId" value={customer.id} />
+            <input type="hidden" name="returnTo" value={`/admin/customers/${customer.id}`} />
             <Field label="Work date" name="workDate" type="date" required defaultValue={today} />
             <Field label="Hours" name="hours" type="number" step="0.25" />
             <Field label="Amount (EUR)" name="amountEuros" type="number" step="0.01" />
@@ -101,6 +117,7 @@ export default async function CustomerDetailPage({
           </form>
           <form action={createPaymentAction} className="grid gap-3">
             <input type="hidden" name="customerId" value={customer.id} />
+            <input type="hidden" name="returnTo" value={`/admin/customers/${customer.id}`} />
             <input type="hidden" name="currency" value={customer.currency} />
             <Field label="Paid on" name="paidOn" type="date" required defaultValue={today} />
             <Field label="Amount (EUR)" name="amountEuros" type="number" step="0.01" required />
@@ -133,12 +150,13 @@ export default async function CustomerDetailPage({
           </form>
         </Panel>
 
-        <Panel>
+        <Panel id="assets" className="scroll-mt-24">
           <h2 className="mb-4 text-sm font-semibold uppercase tracking-wider text-accent">
             Assets
           </h2>
           <form action={createAssetAction} className="mb-6 grid gap-3">
             <input type="hidden" name="customerId" value={customer.id} />
+            <input type="hidden" name="returnTo" value={`/admin/customers/${customer.id}`} />
             <SelectField
               label="Kind"
               name="kind"
@@ -220,7 +238,7 @@ export default async function CustomerDetailPage({
         </Table>
       </Panel>
 
-      <Panel className="mb-6">
+      <Panel id="payments" className="mb-6 scroll-mt-24">
         <h2 className="mb-4 text-sm font-semibold uppercase tracking-wider text-accent">
           Payments
         </h2>

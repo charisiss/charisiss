@@ -31,9 +31,18 @@ export function PageHeader({
   );
 }
 
-export function Panel({ children, className = "" }: { children: ReactNode; className?: string }) {
+export function Panel({
+  children,
+  className = "",
+  id,
+}: {
+  children: ReactNode;
+  className?: string;
+  id?: string;
+}) {
   return (
     <section
+      id={id}
       className={`min-w-0 border border-line bg-surface/60 p-3.5 sm:p-5 ${className}`}
     >
       {children}
