@@ -33,7 +33,8 @@ export default async function CustomerDetailPage({
   const detail = await getCustomerDetail(id);
   if (!detail) notFound();
 
-  const { customer, assets, timeEntries, payments, unbilledCents, paidCents } = detail;
+  const { customer, assets, timeEntries, payments, unbilledCents, timeTotalCents, paidCents } =
+    detail;
   const today = new Date().toISOString().slice(0, 10);
 
   return (
@@ -93,12 +94,14 @@ export default async function CustomerDetailPage({
           </Panel>
         </a>
         <a
-          href="#assets"
+          href="#time"
           className="block outline-none transition-colors hover:border-accent focus-visible:border-accent"
         >
           <Panel className="h-full border-inherit hover:border-accent">
-            <p className="text-xs uppercase tracking-wider text-muted">Assets</p>
-            <p className="mt-2 font-display text-2xl">{assets.length}</p>
+            <p className="text-xs uppercase tracking-wider text-muted">Time total</p>
+            <p className="mt-2 font-display text-2xl">
+              {formatMoney(timeTotalCents, customer.currency)}
+            </p>
           </Panel>
         </a>
       </div>
@@ -226,7 +229,7 @@ export default async function CustomerDetailPage({
         </Panel>
       </div>
 
-      <Panel className="mb-6">
+      <Panel id="time" className="mb-6 scroll-mt-24">
         <h2 className="mb-4 text-sm font-semibold uppercase tracking-wider text-accent">
           Time entries
         </h2>

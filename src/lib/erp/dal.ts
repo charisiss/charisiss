@@ -150,6 +150,7 @@ export async function getCustomerDetail(id: string) {
   const unbilledCents = entries
     .filter((e) => e.billingStatus === "unbilled")
     .reduce((sum, e) => sum + (e.amountCents ?? 0), 0);
+  const timeTotalCents = entries.reduce((sum, e) => sum + (e.amountCents ?? 0), 0);
   const paidCents = customerPayments.reduce((sum, p) => sum + p.amountCents, 0);
 
   return {
@@ -158,6 +159,7 @@ export async function getCustomerDetail(id: string) {
     timeEntries: entries,
     payments: customerPayments,
     unbilledCents,
+    timeTotalCents,
     paidCents,
   };
 }
